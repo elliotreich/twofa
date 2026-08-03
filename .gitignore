@@ -1,0 +1,25 @@
+# Build artifacts
+.build/
+*.app/
+*.dSYM/
+DerivedData/
+
+# SwiftPM
+Package.resolved
+.swiftpm/
+
+# macOS
+.DS_Store
+
+# IDE
+*.xcodeproj/
+*.xcworkspace/
+*.xcuserstate/
+xcuserdata/
+
+# Local config
+.env
+*.local
+
+# Test
+.twofa-state.json
