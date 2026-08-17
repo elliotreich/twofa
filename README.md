@@ -15,19 +15,26 @@ A native macOS daemon that watches for incoming SMS 2FA codes and automatically 
 
 - macOS 13+ (Ventura or later)
 - Apple Silicon (ARM64) — no Rosetta needed
+- Xcode 16+ or Swift 6+ (for `swift build`)
 - Full Disk Access permission for `~/Library/Messages/chat.db`
 
 ## Build & Run
 
 ```bash
-# Build release binary
-swift build -c release
+# Clone
+git clone https://github.com/elliotreich/twofa.git
+cd twofa
 
-# Run directly (requires Full Disk Access)
+# Build (SwiftPM — preferred)
+swift build -c release
+.build/release/twofa
+
+# Or run directly (requires Full Disk Access)
 swift run twofa
 
-# Or install as a launch agent for background operation
-./install.sh  # (optional helper, not included)
+# Single-file alternative (no Package.swift needed)
+swiftc -O -framework AppKit -framework SQLite3 -o twofa main.swift
+./twofa
 ```
 
 ### Full Disk Access
@@ -73,6 +80,30 @@ Two-stage detection:
 |------|-------------|
 | `--parse-hex <file>` | Decode a hex-dumped `attributedBody` blob and exit |
 | `--test-popup` | Show the popup once with a test code and exit after 6s |
+
+## Tests
+
+No automated test suite yet — verification is via real and synthetic `chat.db` files:
+
+```bash
+# Test attributedBody decoding from a hex dump
+swift run twofa --parse-hex /path/to/blob.hex
+
+# Test popup without needing an SMS
+swift run twofa --test-popup
+
+# Point at a synthetic DB (no FDA needed)
+TWOFA_DB=/tmp/test.db swift run twofa
+```
+
+The core detection (keyword + code pattern + exclusion) is deliberately small and pure — a good candidate for future `swift test` coverage.
+
+## Maintenance
+
+- **State file:** `~/.cache/twofa-state.json` stores last-seen `ROWID`. Delete it to re-process from newest.
+- **Launch at login:** copy `.build/release/twofa` to a fixed path and add a LaunchAgent plist with `RunAtLoad`.
+- **Updates:** `git pull && swift build -c release` — no migrations.
+- **Debugging:** logs go to stdout with ISO timestamps; DB errors are rate-limited to once per 5 min.
 
 ## Design Decisions
 
