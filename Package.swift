@@ -12,7 +12,8 @@ let package = Package(
             name: "TwoFA",
             path: ".",
             exclude: ["README.md", "LICENSE", ".gitignore"],
-            sources: ["main.swift"]
+            sources: ["main.swift"],
+            resources: [.copy("Resources")]
         )
     ]
 )

@@ -37,6 +37,13 @@ swiftc -O -framework AppKit -framework SQLite3 -o twofa main.swift
 ./twofa
 ```
 
+## App icon
+
+The macOS app icon is tracked at `Resources/AppIcon.icns`. SwiftPM builds the
+daemon executable; app packaging should copy this asset to
+`TwoFA.app/Contents/Resources/AppIcon.icns` and set `CFBundleIconFile` to
+`AppIcon`.
+
 ### Full Disk Access
 
 The app needs Full Disk Access to read `~/Library/Messages/chat.db`:
