@@ -85,7 +85,7 @@ Two-stage detection:
 
 | Flag | Description |
 |------|-------------|
-| `--parse-hex <file>` | Decode a hex-dumped `attributedBody` blob and exit |
+| `--parse-hex <file>` | Validate a hex-dumped `attributedBody` blob and report whether an OTP was detected (without printing sensitive contents) |
 | `--test-popup` | Show the popup once with a test code and exit after 6s |
 
 ## Tests
@@ -110,7 +110,7 @@ The core detection (keyword + code pattern + exclusion) is deliberately small an
 - **State file:** `~/.cache/twofa-state.json` stores last-seen `ROWID`. Delete it to re-process from newest.
 - **Launch at login:** copy `.build/release/twofa` to a fixed path and add a LaunchAgent plist with `RunAtLoad`.
 - **Updates:** `git pull && swift build -c release` — no migrations.
-- **Debugging:** logs go to stdout with ISO timestamps; DB errors are rate-limited to once per 5 min.
+- **Debugging:** logs go to stdout with ISO timestamps; DB errors are rate-limited to once per 5 min. OTP values, sender identifiers, and message contents are never printed to logs or `--parse-hex` output. The user-facing popup and clipboard still deliberately show or hold the OTP briefly; clipboard history managers may retain it.
 
 ## Design Decisions
 
