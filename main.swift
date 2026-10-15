@@ -289,7 +289,8 @@ func poll() {
 
         guard let code = extractCode(text) else { continue }
         let sender = String(cString: sqlite3_column_text(stmt, 4))
-        log("✓ MATCH rowId=\(rowId) sender=\(sender) code=\(code)")
+        // Do not write OTPs or sender identifiers to stdout or captured service logs.
+        log("✓ MATCH rowId=\(rowId) — verification code detected")
         copyCode(code)
         Popup.show(code: code, sender: sender)
     }
@@ -315,8 +316,9 @@ if let i = args.firstIndex(of: "--parse-hex"), i + 1 < args.count {
         idx = next
     }
     if let text = decodeAttributedBody(data) {
-        print("DECODED: \(text)")
-        print("CODE: \(extractCode(text) ?? "<none>")")
+        // Even diagnostic output must not leak SMS bodies or authentication codes.
+        print("DECODE SUCCEEDED")
+        print("CODE DETECTED: \(extractCode(text) != nil)")
     } else {
         print("DECODE FAILED")
     }
