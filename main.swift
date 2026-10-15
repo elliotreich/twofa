@@ -117,6 +117,32 @@ func extractCode(_ text: String) -> String? {
     return nil
 }
 
+// MARK: - Built-in parser regression tests (no Messages permissions required)
+
+func runSelfTests() -> Bool {
+    let cases: [(message: String, expected: String?)] = [
+        ("Your verification code is 482913", "482913"),
+        ("Use OTP 8214 to sign in", "8214"),
+        ("Tu código de acceso es 123456", "123456"),
+        ("Verification code: 123-456", "123456"),
+        ("Verify with A-123456", "123456"),
+        ("Your code expires 2026", nil),
+        ("Verification code for account ending in 1234", nil),
+        ("Your code is 12", nil),
+        ("Your package has shipped", nil)
+    ]
+    var failures = 0
+    for (index, test) in cases.enumerated() {
+        if extractCode(test.message) != test.expected {
+            failures += 1
+            // Do not print input or OTP values, even when tests fail.
+            print("FAIL: parser case \(index + 1)")
+        }
+    }
+    print("Parser self-test: \(cases.count - failures)/\(cases.count) passed")
+    return failures == 0
+}
+
 // MARK: - Popup
 
 final class Popup {
@@ -304,6 +330,10 @@ func poll() {
 
 setvbuf(stdout, nil, _IOLBF, 0)
 let args = CommandLine.arguments
+
+if args.contains("--self-test") {
+    exit(runSelfTests() ? 0 : 1)
+}
 
 if let i = args.firstIndex(of: "--parse-hex"), i + 1 < args.count {
     let hex = (try! String(contentsOfFile: args[i + 1], encoding: .utf8))
