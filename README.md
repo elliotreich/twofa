@@ -90,9 +90,12 @@ Two-stage detection:
 
 ## Tests
 
-No automated test suite yet — verification is via real and synthetic `chat.db` files:
+The `--self-test` command runs nine permission-free SMS/OTP parser regression cases (successful extraction and false-positive rejection). GitHub Actions runs these tests and a release build on every push and pull request. For additional manual checks, use synthetic `chat.db` files:
 
 ```bash
+# Automated parser regression checks
+swift run twofa --self-test
+
 # Test attributedBody decoding from a hex dump
 swift run twofa --parse-hex /path/to/blob.hex
 
@@ -103,7 +106,7 @@ swift run twofa --test-popup
 TWOFA_DB=/tmp/test.db swift run twofa
 ```
 
-The core detection (keyword + code pattern + exclusion) is deliberately small and pure — a good candidate for future `swift test` coverage.
+The parser regression suite is currently implemented as a self-test rather than an XCTest target. Broader database integration, clipboard timing, and popup behavior still require manual validation.
 
 ## Maintenance
 
